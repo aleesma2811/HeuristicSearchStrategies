@@ -47,10 +47,12 @@ def astar(grid, start, goal, obstacle=None):
     came_from = {}
     g_score = {start: 0} # Costo real
     moves = 0
+    steps = [] ### Pasos para llegar al objetivo
 
     while open_set:
         # Escoger el nodo con el menor precio
         current = min(open_set, key=lambda x: open_set[x][1])
+        steps.append(current) ### Agregar nodo actual a los pasos
 
         if current == goal:
             # Reconstruir camino
@@ -60,7 +62,7 @@ def astar(grid, start, goal, obstacle=None):
                 current = came_from[current]
             path.append(start)
             # Devoler camino ordenado, costo y número de movimientos
-            return path[::-1], g_score[goal], moves
+            return path[::-1], g_score[goal], moves, steps
 
         del open_set[current]
 
@@ -73,7 +75,7 @@ def astar(grid, start, goal, obstacle=None):
                 f_score = tentative_g_score + manhattan_distance(neighbor, goal)
                 open_set[neighbor] = (tentative_g_score, f_score)
                 moves += 1
-    return "No se encontró un camino", 0, 0
+    return "No se encontró un camino", 0, 0, steps
 
 ## Beam Search Algorithm
 def beamSearch(grid, start, goal, k, obstacle=None):
@@ -81,10 +83,12 @@ def beamSearch(grid, start, goal, k, obstacle=None):
     came_from = {}
     g_score = {start: 0} # Actual cost
     moves = 0
+    steps = [] ### Steps to reach the goal
 
     while open_set:
         # Choose the node with the lowest cost
         current = min(open_set, key=lambda x: open_set[x][1])
+        steps.append(current) ### Add current node to steps
 
         if current == goal:
             # Reconstruct path
@@ -94,7 +98,7 @@ def beamSearch(grid, start, goal, k, obstacle=None):
                 current = came_from[current]
             path.append(start)
             # Return ordered path, cost, and number of moves
-            return path[::-1], g_score[goal], moves
+            return path[::-1], g_score[goal], moves, steps
 
         del open_set[current]
 
@@ -110,7 +114,7 @@ def beamSearch(grid, start, goal, k, obstacle=None):
         # Beam Search
         if len(open_set) > k:
             open_set = dict(heapq.nsmallest(k, open_set.items(), key=lambda x: x[1][1]))
-    return "No path found", 0, 0
+    return "No path found", 0, 0, steps
 
 # Función para imprimir el camino encontrado
 def print_path(path):
@@ -119,6 +123,16 @@ def print_path(path):
             if value == node:
                 print(key, end=' -> ')
                 break
+
+#función para regresar el path como un string
+def pathToString(path):
+    pathString = ""
+    for node in path:
+        for key, value in locations.items():
+            if value == node:
+                pathString += key + " -> "
+                break
+    return pathString
 
 ## ------------------------------ A* Algorithm Solving Example ------------------------------ ##
 # Seleccionar nodos y obstáculo
@@ -137,11 +151,11 @@ else:
 
 # Calcular tiempo
 start_time = time.perf_counter_ns()
-path, cost, moves = astar(grid, start, goal, obstacle)
+path, cost, moves, steps = astar(grid, start, goal, obstacle)
 astarSolverTime = (time.perf_counter_ns() - start_time) * 1e-9
 
 print("Camino encontrado: ")
-print_path(path)
+print(pathToString(path))
 print(f"Costo total: {cost}")
 print(f"Número de movimientos: {moves}")
 print(f"Tiempo de ejecución: {astarSolverTime}s")
@@ -163,7 +177,7 @@ else:
 
 # Calcular tiempo
 start_time = time.perf_counter_ns()
-path, cost, moves = beamSearch(grid, start, goal, 13, obstacle)
+path, cost, moves, steps = beamSearch(grid, start, goal, 13, obstacle)
 astarSolverTime = (time.perf_counter_ns() - start_time) * 1e-9
 
 print("Camino encontrado: ")
@@ -171,3 +185,5 @@ print_path(path)
 print(f"Costo total: {cost}")
 print(f"Número de movimientos: {moves}")
 print(f"Tiempo de ejecución: {astarSolverTime}s")
+
+# Poner todo esto en una función para poder llamarla desde otro script

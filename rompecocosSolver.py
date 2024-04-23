@@ -133,3 +133,5 @@ print(f"Solución en {len(movimientos)} movimientos:         Tiempo de ejecució
 
 for fila in solucion:
     print(" ".join(map(str, fila)))
+
+[[3, 1, 2],[4, 0, 5],[6, 7, 8]]
